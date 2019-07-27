@@ -1,0 +1,6 @@
+Flask
+datetime
+selenium
+bs4
+numpy
+pandas
