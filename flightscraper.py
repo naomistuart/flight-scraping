@@ -2,7 +2,7 @@ def flightscraper():
 
     from datetime import datetime
     from selenium import webdriver
-    #from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.chrome.options import Options
     from bs4 import BeautifulSoup
     import numpy as np
     import pandas as pd
@@ -10,11 +10,15 @@ def flightscraper():
 
     # Initialise instance of Chrome driver
     chrome_options = webdriver.ChromeOptions()
-    chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-    chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--disable-dev-shm-usage")
-    chrome_options.add_argument("--no-sandbox")
-    driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+    if (os.environ.get("GOOGLE_CHROME_BIN") is None) | (os.environ.get("CHROMEDRIVER_PATH") is None):
+        chrome_options.add_argument("--headless")
+        driver = webdriver.Chrome(options=chrome_options)
+    else:
+       chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+       chrome_options.add_argument("--headless")
+       chrome_options.add_argument("--disable-dev-shm-usage")
+       chrome_options.add_argument("--no-sandbox")
+       driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
 
     # Define query strings for url
     today = datetime.today().strftime('%Y-%m-%d')
@@ -37,6 +41,9 @@ def flightscraper():
         for terminal_type in terminal_types:
             
             url = "https://www.sydneyairport.com.au/flights/?query=&flightType=" + flight_type + "&terminalType=" + terminal_type + "&date=" + today + "&sortColumn=scheduled_time&ascending=true&showAll=true"
+            
+            # Add logs
+            print(url)
             driver.get(url)
             
             html_soup = BeautifulSoup(driver.page_source, "html.parser")
