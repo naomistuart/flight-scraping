@@ -46,7 +46,7 @@ def flightscraper():
             # Add logs
             print(url)
             driver.get(url)
-            time.sleep(5)
+            time.sleep(3)
             
             html_soup = BeautifulSoup(driver.page_source, "html.parser")
             flight_containers = html_soup.find_all("div", attrs={"class": "flight-card"})[2:]
