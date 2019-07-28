@@ -7,6 +7,7 @@ def flightscraper():
     import numpy as np
     import pandas as pd
     import os
+    import time
 
     # Initialise instance of Chrome driver
     chrome_options = webdriver.ChromeOptions()
@@ -45,6 +46,7 @@ def flightscraper():
             # Add logs
             print(url)
             driver.get(url)
+            time.sleep(5)
             
             html_soup = BeautifulSoup(driver.page_source, "html.parser")
             flight_containers = html_soup.find_all("div", attrs={"class": "flight-card"})[2:]
