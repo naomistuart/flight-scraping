@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='loading.css') }}">
+<link rel="icon" type="image/png" href="../static/images/icon.png" />
+<meta charset="utf-8">
+<title>Sydney Flights Today</title>
+<div class="loading">
+  <h1> Please fasten your seat belt as we fetch your data...</h1>
+  <h2>Thanks for flying with us today.</h2>
+  <img class="center" src="{{ url_for('static',
+  filename='images/airplane.gif') }}" ng-show="loading">
+</div>
+<script> window.location.replace('/results'); </script>
