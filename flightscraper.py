@@ -91,7 +91,8 @@ def flightscraper():
                 # Estimated times
                 estimated_times.append(container.find("div", attrs={"class": "estimated-time"}).text)
         
-        
+    time.sleep(1)
+
     # Create dataframe from lists
     flights = pd.DataFrame({'Journey': journies,
                             'Type': types,
