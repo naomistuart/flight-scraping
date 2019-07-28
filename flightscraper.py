@@ -42,9 +42,7 @@ def flightscraper():
         for terminal_type in terminal_types:
             
             url = "https://www.sydneyairport.com.au/flights/?query=&flightType=" + flight_type + "&terminalType=" + terminal_type + "&date=" + today + "&sortColumn=scheduled_time&ascending=true&showAll=true"
-            
-            # Add logs
-            print(url)
+            print(url) # logs
             driver.get(url)
             time.sleep(1)
             
@@ -86,10 +84,10 @@ def flightscraper():
                 statuses.append(container.find("div", attrs={"class": "status"}).text)
 
                 # Scheduled times
-                scheduled_times.append(container.find("div", attrs={"class": "large-scheduled-time"}).text)
+                scheduled_times.append(container.find("div", attrs={"class": "large-scheduled-time"}).text[0:5])
 
                 # Estimated times
-                estimated_times.append(container.find("div", attrs={"class": "estimated-time"}).text)
+                estimated_times.append(container.find("div", attrs={"class": "estimated-time"}).text[0:5])
         
     time.sleep(1)
 
