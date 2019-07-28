@@ -12,7 +12,7 @@ def flightscraper():
     chrome_options.add_argument("--headless")
     ##System.setProperty("webdriver.chrome.driver", "C:\\Users\\michael\\Downloads\\chromedriver_win32.exe");
     ##driver = webdriver.Chrome(executable_path=os.path.abspath("chromedriver.exe")
-    driver = webdriver.Chrome(executable_path=".", options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options)
 
     # Define query strings for url
     today = datetime.today().strftime('%Y-%m-%d')
