@@ -75,7 +75,7 @@ Note the loading gif will play for around 20 seconds while the data is fetched.
 - Configuring Chrome Driver to work on Heroku was challenging
 - Chrome Driver was downloaded as an `.exe` file - this worked fine while testing locally, but posed problems when attempting to deploy to Heroku
 - Successful solution, based on Andres Sevilla's [YouTube video](https://www.youtube.com/watch?v=Ven-pqwk3ec&fbclid=IwAR2zpRZK8rdvqgzsOPcwMZMzpp8N-hE6YlMcW-mQivaxy2u7iXmwCDe-Mcw):  
-    **1. Initialise instance of Chrome Driver:**
+**1. Initialise instance of Chrome Driver:**
     ```python
     from selenium import webdriver
     import os
@@ -113,7 +113,7 @@ Note the loading gif will play for around 20 seconds while the data is fetched.
 - [How to build a web application using Flask and deploy it to the cloud](https://www.freecodecamp.org/news/how-to-build-a-web-application-using-flask-and-deploy-it-to-the-cloud-3551c985e492/)
 - [Tutorial: Web Scraping and BeautifulSoup](https://www.dataquest.io/blog/web-scraping-beautifulsoup/)
 
-### ChromeDriver examples & trouble-shooting
+### Chrome Driver examples & trouble-shooting
 - [chromedriver-heroku project by sonyasha](https://github.com/sonyasha/chromedriver-heroku)
 - [Running ChromeDriver with Python Selenium on Heroku](https://www.youtube.com/watch?v=Ven-pqwk3ec&fbclid=IwAR2zpRZK8rdvqgzsOPcwMZMzpp8N-hE6YlMcW-mQivaxy2u7iXmwCDe-Mcw)
 
