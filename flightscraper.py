@@ -44,7 +44,6 @@ def flightscraper():
             url = "https://www.sydneyairport.com.au/flights/?query=&flightType=" + flight_type + "&terminalType=" + terminal_type + "&date=" + today + "&sortColumn=scheduled_time&ascending=true&showAll=true"
             print(url) # logs
             driver.get(url)
-            time.sleep(1)
             
             html_soup = BeautifulSoup(driver.page_source, "html.parser")
             flight_containers = html_soup.find_all("div", attrs={"class": "flight-card"})[2:]
@@ -88,8 +87,6 @@ def flightscraper():
 
                 # Estimated times
                 estimated_times.append(container.find("div", attrs={"class": "estimated-time"}).text[0:5])
-        
-    time.sleep(1)
 
     # Create dataframe from lists
     flights = pd.DataFrame({'Journey': journies,
