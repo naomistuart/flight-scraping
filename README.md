@@ -11,7 +11,7 @@ The goal of this project is to build a web application to scrap Sydney Airport's
 **[References](#References)**<br>
 
 ## Background
-Sydney Airport's flight listing page enables a user to choose between Arrivals or Departures, and between Domestic or International flights. However, this is no option to display all flights on a single page. For plane spotting purposes, it would be helpful to have a complete listing of the current day's flights in a single place.
+Sydney Airport's [flight listing page](https://www.sydneyairport.com.au/flights/) enables a user to choose between Arrivals or Departures, and between Domestic or International flights. However, this is no option to display all flights on a single page. For plane spotting purposes, it would be helpful to have a complete listing of the current day's flights in a single place.
 
 
 ## Features of the completed web app
@@ -21,17 +21,17 @@ Sydney Airport's flight listing page enables a user to choose between Arrivals o
 
 
 ## Built with
-- [Flask](https://flask.palletsprojects.com/en/1.0.x/) - Python framework used to build the web application
 - [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) - Python library used to scrap HTML pages
 - [Selenium](https://pypi.org/project/selenium/) [ChromeDriver](http://chromedriver.chromium.org/getting-started) - used to automate Chrome browser interaction from Python
+- [Flask](https://flask.palletsprojects.com/en/1.0.x/) - Python framework used to build the web application
 
 
 ## Method
 A brief description of the steps used to create the web app:
 
 ### 1. Web scraping
-- Use Selenium Chromedriver to grab HTML content from Sdyney Airport's flight listing page. There are four possible combinations of domestic / international and arrival / departures, so there are four HTML pages to grab.
-- Use BeautifulSoup to parse the HTML content and pull out relevant information. For each flight, relevant info includes its origin / destination, stopover (if any), airline, flight number, status (arrived, departed, delayed, cancelled etc.), scheduled time, and estimated time.
+- Use Selenium Chromedriver to grab HTML content from Sydney Airport's flight listing page. There are four possible combinations of domestic / international and arrival / departures, so there are four HTML pages to grab
+- Use BeautifulSoup to parse the HTML content and pull out relevant information. For each flight, relevant info includes its origin / destination, stopover (if any), airline, flight number, status (arrived, departed, delayed, cancelled etc.), scheduled time, and estimated time
 - Store parsed data in a Pandas dataframe. Each row corresponds to a single flight today.
 
 ### 2. Build Flask app
@@ -89,14 +89,16 @@ Note the loading gif will play for around 20 seconds while the data is fetched.
     ```
 
     **2. Add the following buildpacks to the Heroku app:**
-        - [https://github.com/heroku/heroku-buildpack-google-chrome](https://github.com/heroku/heroku-buildpack-google-chrome)
-        - [https://github.com/heroku/heroku-buildpack-chromedriver](https://github.com/heroku/heroku-buildpack-chromedriver)
-        Note: Buildpacks can be easily added by going to the **Settings** tab of the app on Heroku
+    - [https://github.com/heroku/heroku-buildpack-google-chrome](https://github.com/heroku/heroku-buildpack-google-chrome)
+    - [https://github.com/heroku/heroku-buildpack-chromedriver](https://github.com/heroku/heroku-buildpack-chromedriver)
+    
+    Note: Buildpacks can be easily added by going to the **Settings** tab of the app on Heroku
 
     **3. Add the following config vars to the Heroku app:**
-        - `CHROMEDRIVER_PATH = /app/.chromedriver/bin/chromedriver`
-        - `GOOGLE_CHROME_BIN = /app/.apt/usr/bin/google-chrome`
-        Note: Config vars can be easily edited by going to the **Settings** tab of the app on Heroku
+    - `CHROMEDRIVER_PATH = /app/.chromedriver/bin/chromedriver`
+    - `GOOGLE_CHROME_BIN = /app/.apt/usr/bin/google-chrome`
+    
+    Note: Config vars can be easily edited by going to the **Settings** tab of the app on Heroku
 
 
 ### Heroku memory quotas
@@ -112,7 +114,7 @@ Note the loading gif will play for around 20 seconds while the data is fetched.
 - [Tutorial: Web Scraping and BeautifulSoup](https://www.dataquest.io/blog/web-scraping-beautifulsoup/)
 
 ### ChromeDriver examples & trouble-shooting
-- [chromedriver-heroku by sonyasha](https://github.com/sonyasha/chromedriver-heroku)
+- [chromedriver-heroku project by sonyasha](https://github.com/sonyasha/chromedriver-heroku)
 - [Running ChromeDriver with Python Selenium on Heroku](https://www.youtube.com/watch?v=Ven-pqwk3ec&fbclid=IwAR2zpRZK8rdvqgzsOPcwMZMzpp8N-hE6YlMcW-mQivaxy2u7iXmwCDe-Mcw)
 
 ### Image sources
