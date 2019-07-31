@@ -2,13 +2,13 @@
 The goal of this project is to build a web application to scrap Sydney Airport's [flight listing pages](https://www.sydneyairport.com.au/flights/), and to display all of today's flights in a single HTML page.
 
 ## Table of Contents
-**[Background](#Background)**
-**[Features of the completed webapp](#Features-of-the-completed-web-app)**
-**[Built with](#Build-with)**
-**[Method](#Method)**
-**[How to use](#How-to-use)**
-**[Tricky bits and challenges](#Tricky-bits-and-challenges)**
-**[References](#References)**
+**[Background](#Background)**<br>
+**[Features of the completed webapp](#Features-of-the-completed-web-app)**<br>
+**[Built with](#Build-with)**<br>
+**[Method](#Method)**<br>
+**[How to use](#How-to-use)**<br>
+**[Tricky bits and challenges](#Tricky-bits-and-challenges)**<br>
+**[References](#References)**<br>
 
 ## Background
 Sydney Airport's flight listing page enables a user to choose between Arrivals or Departures, and between Domestic or International flights. However, this is no option to display all flights on a single page. For plane spotting purposes, it would be helpful to have a complete listing of the current day's flights in a single place.
@@ -55,7 +55,7 @@ $ python main.py
 Open localhost `http://127.0.0.1:5000/`. You should see the webpage rendered.
 
 ### On the web
-Go to [https://sydneyflights.herokuapp.com/](https://sydneyflights.herokuapp.com/)
+Go to [https://sydneyflights.herokuapp.com/](https://sydneyflights.herokuapp.com/)  
 Note the loading gif will play for around 20 seconds while the data is fetched.
 
 ## Tricky bits and challenges
@@ -74,7 +74,7 @@ Note the loading gif will play for around 20 seconds while the data is fetched.
 ### Running Chrome Driver on Heroku
 - Configuring Chrome Driver to work on Heroku was challenging
 - Chrome Driver was downloaded as an `.exe` file - this worked fine while testing locally, but posed problems when attempting to deploy to Heroku
-- Successful solution, based on Andres Sevilla's [YouTube video](https://www.youtube.com/watch?v=Ven-pqwk3ec&fbclid=IwAR2zpRZK8rdvqgzsOPcwMZMzpp8N-hE6YlMcW-mQivaxy2u7iXmwCDe-Mcw):
+- Successful solution, based on Andres Sevilla's [YouTube video](https://www.youtube.com/watch?v=Ven-pqwk3ec&fbclid=IwAR2zpRZK8rdvqgzsOPcwMZMzpp8N-hE6YlMcW-mQivaxy2u7iXmwCDe-Mcw):  
     **1. Initialise instance of Chrome Driver:**
     ```python
     from selenium import webdriver
