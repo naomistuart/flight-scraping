@@ -1,4 +1,4 @@
-def flightscraper():
+def flightscraper(returnDataFrame):
 
     from datetime import datetime
     from selenium import webdriver
@@ -87,22 +87,29 @@ def flightscraper():
 
                 # Estimated times
                 estimated_times.append(container.find("div", attrs={"class": "estimated-time"}).text[0:5])
+    
+    # Create dictionary of flights
+    flights = {
+        'Type': types,
+        'Journey': journies,
+        'Stopover': stopovers,
+        'Airline': airlines,
+        'Logo': airline_logos,
+        'Flight number': flight_numbers,
+        'Status': statuses,
+        'Scheduled time': scheduled_times,
+        'Estimated time': estimated_times 
+    }
 
-    # Create dataframe from lists
-    flights = pd.DataFrame({'Journey': journies,
-                            'Type': types,
-                            'Stopover': stopovers,
-                            'Airline': airlines,
-                            'Logo': airline_logos,
-                            'Flight number': flight_numbers,
-                            'Status': statuses,
-                            'Scheduled time': scheduled_times,
-                            'Estimated time': estimated_times})
-    # Reorder columns
-    flights = flights[['Type', 'Journey', 'Stopover', 'Airline', 'Logo', 'Flight number', 'Status', 'Scheduled time', 'Estimated time']]
-    
-    # Order flights by scheduled time
-    flights.sort_values(by=['Scheduled time'], inplace=True)
-    flights.reset_index(drop=True, inplace=True)
-    
+    if returnDataFrame:
+        # Create dataframe from dictionary
+        flights = pd.DataFrame(flights)
+        
+        # Reorder columns
+        flights = flights[['Type', 'Journey', 'Stopover', 'Airline', 'Logo', 'Flight number', 'Status', 'Scheduled time', 'Estimated time']]
+        
+        # Order flights by scheduled time
+        flights.sort_values(by=['Scheduled time'], inplace=True)
+        flights.reset_index(drop=True, inplace=True)
+   
     return flights

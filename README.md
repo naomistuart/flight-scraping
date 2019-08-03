@@ -3,7 +3,7 @@ The goal of this project is to build a web application to scrap Sydney Airport's
 
 ## Table of Contents
 **[Background](#Background)**<br>
-**[Features of the completed webapp](#Features-of-the-completed-web-app)**<br>
+**[Features of the completed web app](#Features-of-the-completed-web-app)**<br>
 **[Built with](#Build-with)**<br>
 **[Method](#Method)**<br>
 **[How to use](#How-to-use)**<br>
