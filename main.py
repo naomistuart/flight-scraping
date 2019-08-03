@@ -4,8 +4,13 @@ from flask_heroku import Heroku
 import pandas as pd
 from flightscraper import flightscraper
 from imgconverter import path_to_image_html
+import os
+
+basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
+#DATABASE URL FOR HEROKU POSTGRES CAN BE FOUND UNDER CONFIG VARS
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 heroku = Heroku(app)
 db = SQLAlchemy(app)
@@ -59,6 +64,10 @@ def loading():
 
 @app.route("/refreshdata")
 def refresh_data():
+    num_rows_deleted = Flight.query.delete()
+    db.session.commit()
+    print("deleted {} rows".format(num_rows_deleted))
+    
     flights = flightscraper(returnDataFrame=False)
     
     for i in range(0, len(flights["Type"])):
@@ -77,14 +86,35 @@ def refresh_data():
 
             db.session.add(flight)
             db.session.commit()
-            return "Flight added, flight number={}".format(flight.flight_number)
+            print("Flight added, flight number={}".format(flight.flight_number))
         
         except Exception as e:
-            return(str(e))
+            print(str(e))
+    
+    return "END OF DATA LOAD"
 
 @app.route("/results")
 def results():
     flights = flightscraper(returnDataFrame=True)
+    pd.options.display.max_colwidth = 200
+    return render_template("flights.html", tables=[flights.to_html(index=False, classes="flights", escape=False, formatters=dict(Type=path_to_image_html, Logo=path_to_image_html))], titles=['Sydney flights'])
+
+@app.route("/newresults")
+def newresults():
+    flights = pd.read_sql(Flight.query.statement, db.session.bind)
+    flights.rename(columns={
+        "flight_type": "Type", 
+        "journey": "Journey",
+        "stopover": "Stopover",
+        "airline": "Airline",
+        "airline_logo": "Logo",
+        "flight_number": "Flight number",
+        "status": "Status",
+        "scheduled_time": "Scheduled time",
+        "estimated_time": "Estimated time"}, inplace=True)
+    flights.sort_values(by=['Scheduled time'], inplace=True)
+    flights.drop(columns=["id"], inplace=True)
+
     pd.options.display.max_colwidth = 200
     return render_template("flights.html", tables=[flights.to_html(index=False, classes="flights", escape=False, formatters=dict(Type=path_to_image_html, Logo=path_to_image_html))], titles=['Sydney flights'])
 
