@@ -15,48 +15,63 @@ Sydney Airport's [flight listing page](https://www.sydneyairport.com.au/flights/
 
 
 ## Features of the completed web app
-1. Dynamic loading screen while data is fetched
-2. Results page displays complete listing of today's flights at Sydney Airport. Icons are used to differentiate between arrivals and departures, and between domestic and international flights
-3. Web application is [deployed to heroku](https://sydneyflights.herokuapp.com/)
+- Dynamic loading screen while data is fetched
+- Results page displays complete listing of today's flights at Sydney Airport. Icons are used to differentiate between arrivals and departures, and between domestic and international flights
+- Data is refreshed every 15 minutes and synced to a PostgreSQL database
+- Web application is [deployed to heroku](https://sydneyflights.herokuapp.com/)
 
 
 ## Built with
 - [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) - Python library used to scrap HTML pages
 - [Selenium](https://pypi.org/project/selenium/) [ChromeDriver](http://chromedriver.chromium.org/getting-started) - used to automate Chrome browser interaction from Python
 - [Flask](https://flask.palletsprojects.com/en/1.0.x/) - Python framework used to build the web application
+- [APScheduler](https://apscheduler.readthedocs.io/en/latest/) - Python library used to schedule automatic cron refreshes of the flight data
+- [Heroku Postgres](https://www.heroku.com/postgres) - used to cache flight data
 
 
 ## Method
 A brief description of the steps used to create the web app:
 
 ### 1. Web scraping
-- Use Selenium Chromedriver to grab HTML content from Sydney Airport's flight listing page. There are four possible combinations of domestic / international and arrival / departures, so there are four HTML pages to grab
-- Use BeautifulSoup to parse the HTML content and pull out relevant information. For each flight, relevant info includes its origin / destination, stopover (if any), airline, flight number, status (arrived, departed, delayed, cancelled etc.), scheduled time, and estimated time
+- Use [Selenium](https://pypi.org/project/selenium/) [ChromeDriver](http://chromedriver.chromium.org/getting-started) to grab HTML content from Sydney Airport's flight listing page. There are four possible combinations of domestic / international and arrival / departures, so there are four HTML pages to grab
+- Use [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/bs4/doc/) to parse the HTML content and pull out relevant information. For each flight, relevant info includes its origin / destination, stopover (if any), airline, flight number, status (arrived, departed, delayed, cancelled etc.), scheduled time, and estimated time
 - Store parsed data in a Pandas dataframe. Each row corresponds to a single flight today.
 
 ### 2. Build Flask app
-- Create Flask app with two routes - one for loading screen while waiting for data to be fetched, and one to display the results table
+- Create [Flask](https://flask.palletsprojects.com/en/1.0.x/) app with two routes - one for loading screen while waiting for data to be fetched, and one to display the results table
 - Use CSS templates to style the loading and result pages.
 
-### 3. Deploy to Heroku
+### 3. Connect to database
+- Set up a SQLite database for local testing
+- Write python function to store scraped data in the database table, and use [APScheduler](https://apscheduler.readthedocs.io/en/latest/) library to schedule automatic refreshes of the flight data
+- Connect the `/results` route of the Flask app to fetch data from the database, instead of performing a fresh web scrap every time this endpoint is called.
+
+### 4. Deploy to Heroku
 - Define a `Procfile` to declare the command to be executed to start the app. [Gunicorn](https://gunicorn.org/) is used as the web server.
 - Define a `requirements.txt` to specify the Python package dependencies on Heroku via pip
-- Create a new Heroku app and deploy by connecting to GitHub repository.
+- Create a new Heroku app and set up the [PostgreSQL database add-on](https://www.heroku.com/postgres)
+- Deploy by connecting to GitHub repository.
 
 
 ## How to use
 
 ### Local use
-Navigate to project root directory and run the following commands:
-```console
-$ pip install -r requirements.txt
-$ python main.py
-```
-Open localhost `http://127.0.0.1:5000/`. You should see the webpage rendered.
+1. Uncomment the following lines of code in `main.py` to configure the SQLite database for local testing.
+    ```python
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+    ```
+
+2. Navigate to the project root directory and run the following commands:
+    ```console
+    $ pip install -r requirements.txt
+    $ python main.py
+    ```
+3. Open localhost `http://127.0.0.1:5000/`. You should see the webpage rendered.
+
 
 ### On the web
-Go to [https://sydneyflights.herokuapp.com/](https://sydneyflights.herokuapp.com/)  
-Note the loading gif will play for around 20 seconds while the data is fetched.
+Go to [https://sydneyflights.herokuapp.com/](https://sydneyflights.herokuapp.com/).
 
 ## Tricky bits and challenges
 ### Scraping dynamic HTML pages
@@ -100,11 +115,18 @@ Note the loading gif will play for around 20 seconds while the data is fetched.
     
     Note: Config vars can be easily edited by going to the **Settings** tab of the app on Heroku
 
+### Heroku dyno sleeping
+- This app uses a free web dyno on Heroku. The app [goes to sleep](https://devcenter.heroku.com/articles/free-dyno-hours#dyno-sleeping) if the dyno receives no web traffic in a 30-minute period
+- This poses a problem for the database's scheduled updates - the data will not be updated unless the python code is running on a server
+- To solve this, a function was added to ping the app every 20 minutes
+- This ensures the database always contains up-to-date data, and users encounter minimal load times when opening the app.
+
 
 ### Heroku memory quotas
-- Currently, the Heroku app often fails to return a complete flight listing, instead returning only a partial listing
-- This is because Heroku has [memory restrictions](https://devcenter.heroku.com/articles/limits) (500 MB per application), and exceeding this causes a "Memory quota exceeded" error
-- Future work for this project will implement a Postgres database to store recent flight information, so the Sydney Airport website does not have to be scrapped every time a user opens the Heroku app. This will improve load times and work around the memory quota issue.
+- Heroku has [memory restrictions](https://devcenter.heroku.com/articles/limits) (maximum 512 MB per app for a free web dyno), and exceeding this causes a "Memory quota exceeded" error
+- This can sometimes prevent successful scraping and database updates
+- Have experimented with reducing the frequency of scheduled database updates to circumvent the memory quota issue
+- It appears the chromedriver used for web scraping causes an excessive memory load, and the problem cannot be completely solved unless upgrading to a paid Heroku tier.
 
 
 ## References
