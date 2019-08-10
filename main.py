@@ -10,6 +10,7 @@ from apscheduler.triggers.interval import IntervalTrigger
 import atexit
 import time
 from datetime import datetime
+from requests import get
 
 # Set up Flask app
 app = Flask(__name__)
@@ -24,7 +25,6 @@ db = SQLAlchemy(app)
 class Flight(db.Model):
     __tablename__ = 'flights'
 
-    #id = db.Column(db.Integer, primary_key=True)
     flight_type = db.Column(db.String(), primary_key=True)
     journey = db.Column(db.String())
     stopover = db.Column(db.String())
@@ -100,18 +100,25 @@ def refresh_flights(terminal, journey):
             except Exception as e:
                 print(str(e))
 
+# Function to ping Heroku app every 20 minutes so it doesn't go to sleep
+def ping_app():
+    url = "https://sydneyflights.herokuapp.com/"
+    get(url)
+
 
 # Set up cron schedules to refresh data
-schedules = ["0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55",
-             "1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56",
-             "2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57",
-             "3, 8, 13, 18, 23, 28, 33, 38, 43, 48, 53, 58"]
+schedules = ["0, 12, 24, 36, 48",
+             "3, 15, 27, 39, 51",
+             "6, 18, 30, 42, 54",
+             "9, 21, 33, 45, 57",
+             "1, 22, 43"]
 scheduler = BackgroundScheduler()
 scheduler.start()
 scheduler.add_job(refresh_flights, "cron", args=["international", "arrival"], minute=schedules[0])
 scheduler.add_job(refresh_flights, "cron", args=["international", "departure"], minute=schedules[1])
 scheduler.add_job(refresh_flights, "cron", args=["domestic", "arrival"], minute=schedules[2])
 scheduler.add_job(refresh_flights, "cron", args=["domestic", "departure"], minute=schedules[3])
+scheduler.add_job(ping_app, "cron", minute=schedules[4])
 
 atexit.register(lambda: scheduler.shutdown())
 
