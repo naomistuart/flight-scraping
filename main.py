@@ -67,36 +67,38 @@ class Flight(db.Model):
 
 # Function to refresh flight data - this will be run on cron schedule
 def refresh_flights(terminal, journey):
-    # Delete rows in table corresponding to terminal and journey type
-    flight_type_str = 'static/images/{}_{}.png'.format(terminal, journey)
-    Flight.query.filter(Flight.flight_type==flight_type_str).delete()
-    db.session.commit()
-
     # Get new data
     flights = flightscraper2(terminal=terminal, journey=journey)
+    
+    # Check if returned data is not empty
+    if len(flights['Type']) > 0:
+        # Delete rows in table corresponding to terminal and journey type
+        flight_type_str = 'static/images/{}_{}.png'.format(terminal, journey)
+        Flight.query.filter(Flight.flight_type==flight_type_str).delete()
+        db.session.commit()
 
-    # Save new data in database
-    for i in range(0, len(flights["Type"])):
-        try:
-            flight = Flight(
-                flight_type=flights["Type"][i],
-                journey=flights["Journey"][i],
-                stopover=flights["Stopover"][i],
-                airline=flights["Airline"][i],
-                airline_logo=flights["Logo"][i],
-                flight_number=flights["Flight number"][i],
-                status=flights["Status"][i],
-                scheduled_time=flights["Scheduled time"][i],
-                estimated_time=flights["Estimated time"][i],
-                time_modified=str(datetime.now())
-            )
+        # Save new data in database
+        for i in range(0, len(flights["Type"])):
+            try:
+                flight = Flight(
+                    flight_type=flights["Type"][i],
+                    journey=flights["Journey"][i],
+                    stopover=flights["Stopover"][i],
+                    airline=flights["Airline"][i],
+                    airline_logo=flights["Logo"][i],
+                    flight_number=flights["Flight number"][i],
+                    status=flights["Status"][i],
+                    scheduled_time=flights["Scheduled time"][i],
+                    estimated_time=flights["Estimated time"][i],
+                    time_modified=str(datetime.now())
+                )
 
-            db.session.add(flight)
-            db.session.commit()
-            print("Flight added, flight number={}".format(flight.flight_number))
-        
-        except Exception as e:
-            print(str(e))
+                db.session.add(flight)
+                db.session.commit()
+                print("Flight added, flight number={}".format(flight.flight_number))
+            
+            except Exception as e:
+                print(str(e))
 
 
 # Set up cron schedules to refresh data
@@ -118,38 +120,6 @@ atexit.register(lambda: scheduler.shutdown())
 def loading():
     return render_template("loading.html")
 
-@app.route("/refreshdata")
-def refresh_data():
-    num_rows_deleted = Flight.query.delete()
-    db.session.commit()
-    print("deleted {} rows".format(num_rows_deleted))
-    
-    flights = flightscraper(returnDataFrame=False)
-    
-    for i in range(0, len(flights["Type"])):
-        try:
-            flight = Flight(
-                flight_type=flights["Type"][i],
-                journey=flights["Journey"][i],
-                stopover=flights["Stopover"][i],
-                airline=flights["Airline"][i],
-                airline_logo=flights["Logo"][i],
-                flight_number=flights["Flight number"][i],
-                status=flights["Status"][i],
-                scheduled_time=flights["Scheduled time"][i],
-                estimated_time=flights["Estimated time"][i],
-                time_modified=str(datetime.now())
-            )
-
-            db.session.add(flight)
-            db.session.commit()
-            print("Flight added, flight number={}".format(flight.flight_number))
-        
-        except Exception as e:
-            print(str(e))
-    
-    return "END OF DATA LOAD"
-
 @app.route("/results")
 def newresults():
     flights = pd.read_sql(Flight.query.statement, db.session.bind)
@@ -164,6 +134,8 @@ def newresults():
         "scheduled_time": "Scheduled time",
         "estimated_time": "Estimated time",
         "time_modified": "Time Modified"}, inplace=True)
+    
+    flights.drop(columns=["Time Modified"], inplace=True)
     flights.sort_values(by=['Scheduled time'], inplace=True)
 
     pd.options.display.max_colwidth = 200
