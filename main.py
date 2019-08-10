@@ -1,6 +1,8 @@
 from flask import Flask, render_template
 from flask_sqlalchemy import SQLAlchemy
 from flask_heroku import Heroku
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 import pandas as pd
 from flightscraper2 import flightscraper2
 from imgconverter import path_to_image_html
@@ -20,6 +22,18 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 heroku = Heroku(app)
 db = SQLAlchemy(app)
+
+# Initialise instance of Chrome driver
+chrome_options = webdriver.ChromeOptions()
+if (os.environ.get("GOOGLE_CHROME_BIN") is None) | (os.environ.get("CHROMEDRIVER_PATH") is None):
+    chrome_options.add_argument("--headless")
+    driver = webdriver.Chrome(options=chrome_options)
+else:
+   chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+   chrome_options.add_argument("--headless")
+   chrome_options.add_argument("--disable-dev-shm-usage")
+   chrome_options.add_argument("--no-sandbox")
+   driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
 
 # Define Flight table schema
 class Flight(db.Model):
@@ -68,7 +82,7 @@ class Flight(db.Model):
 # Function to refresh flight data - this will be run on cron schedule
 def refresh_flights(terminal, journey):
     # Get new data
-    flights = flightscraper2(terminal=terminal, journey=journey)
+    flights = flightscraper2(terminal=terminal, journey=journey, driver=driver)
     
     # Check if returned data is not empty
     if len(flights['Type']) > 0:
@@ -107,11 +121,17 @@ def ping_app():
 
 
 # Set up cron schedules to refresh data
-schedules = ["0",
-             "15",
-             "30",
-             "45",
-             "20, 40, 59"]
+# schedules = ["0",
+#              "15",
+#              "30",
+#              "45",
+#              "20, 40, 59"]
+
+schedules = ["0, 12, 24, 36, 48",
+             "3, 15, 27, 39, 51",
+             "6, 18, 30, 42, 54",
+             "9, 21, 33, 45, 57",
+             "1, 22, 43"]
 scheduler = BackgroundScheduler()
 scheduler.start()
 scheduler.add_job(refresh_flights, "cron", args=["international", "arrival"], minute=schedules[0])

@@ -1,25 +1,11 @@
-def flightscraper2(terminal, journey):
+def flightscraper2(terminal, journey, driver):
 
     from datetime import datetime
-    from selenium import webdriver
-    from selenium.webdriver.chrome.options import Options
     from bs4 import BeautifulSoup
     import numpy as np
     import pandas as pd
     import os
     import time
-
-    # Initialise instance of Chrome driver
-    chrome_options = webdriver.ChromeOptions()
-    if (os.environ.get("GOOGLE_CHROME_BIN") is None) | (os.environ.get("CHROMEDRIVER_PATH") is None):
-        chrome_options.add_argument("--headless")
-        driver = webdriver.Chrome(options=chrome_options)
-    else:
-       chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
-       chrome_options.add_argument("--headless")
-       chrome_options.add_argument("--disable-dev-shm-usage")
-       chrome_options.add_argument("--no-sandbox")
-       driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
 
     # Define query strings for url
     today = datetime.today().strftime('%Y-%m-%d')
