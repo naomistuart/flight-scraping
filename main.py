@@ -6,11 +6,11 @@ from flightscraper import flightscraper
 from imgconverter import path_to_image_html
 import os
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+#basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
 #DATABASE URL FOR HEROKU POSTGRES CAN BE FOUND UNDER CONFIG VARS
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 heroku = Heroku(app)
 db = SQLAlchemy(app)
