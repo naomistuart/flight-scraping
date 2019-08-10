@@ -24,20 +24,19 @@ db = SQLAlchemy(app)
 class Flight(db.Model):
     __tablename__ = 'flights'
 
-    id = db.Column(db.Integer, primary_key=True)
-    flight_type = db.Column(db.String())
+    #id = db.Column(db.Integer, primary_key=True)
+    flight_type = db.Column(db.String(), primary_key=True)
     journey = db.Column(db.String())
     stopover = db.Column(db.String())
     airline = db.Column(db.String())
     airline_logo = db.Column(db.String())
-    flight_number = db.Column(db.String())
+    flight_number = db.Column(db.String(), primary_key=True)
     status = db.Column(db.String())
     scheduled_time = db.Column(db.String())
     estimated_time = db.Column(db.String())
-    #
     time_modified = db.Column(db.String())
 
-    def __init__(self, flight_type, journey, stopover, airline, airline_logo, flight_number, status, scheduled_time, estimated_time):
+    def __init__(self, flight_type, journey, stopover, airline, airline_logo, flight_number, status, scheduled_time, estimated_time, time_modified):
         self.flight_type = flight_type
         self.journey = journey
         self.stopover = stopover
@@ -47,7 +46,6 @@ class Flight(db.Model):
         self.status = status
         self.scheduled_time = scheduled_time
         self.estimated_time = estimated_time
-        #
         self.time_modified = time_modified
 
     def __repr__(self):
@@ -55,7 +53,6 @@ class Flight(db.Model):
 
     def serialise(self):
         return {
-            'id': self.id,
             'flight_type': self.flight_type,
             'journey': self.journey,
             'stopover': self.stopover,
@@ -65,7 +62,6 @@ class Flight(db.Model):
             'status': self.status,
             'scheduled_time': self.scheduled_time,
             'estimated_time': self.estimated_time,
-            #
             'time_modified': self.time_modified
         }
 
@@ -73,8 +69,7 @@ class Flight(db.Model):
 def refresh_flights(terminal, journey):
     # Delete rows in table corresponding to terminal and journey type
     flight_type_str = 'static/images/{}_{}.png'.format(terminal, journey)
-    delete_rows = Flight.delete().where(Flight.flight_type==flight_type_str)
-    db.session.execute()
+    Flight.query.filter(Flight.flight_type==flight_type_str).delete()
     db.session.commit()
 
     # Get new data
@@ -93,7 +88,7 @@ def refresh_flights(terminal, journey):
                 status=flights["Status"][i],
                 scheduled_time=flights["Scheduled time"][i],
                 estimated_time=flights["Estimated time"][i],
-                time_modified=datetime.now()
+                time_modified=str(datetime.now())
             )
 
             db.session.add(flight)
@@ -111,10 +106,10 @@ schedules = ["0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55",
              "3, 8, 13, 18, 23, 28, 33, 38, 43, 48, 53, 58"]
 scheduler = BackgroundScheduler()
 scheduler.start()
-scheduler.add_job(refresh_flights(terminal="international", journey="arrival"), "cron", minute=schedules[0])
-scheduler.add_job(refresh_flights(terminal="international", journey="departure"), "cron", minute=schedules[1])
-scheduler.add_job(refresh_flights(terminal="domestic", journey="arrival"), "cron", minute=schedules[2])
-scheduler.add_job(refresh_flights(terminal="domestic", journey="departure"), "cron", minute=schedules[3])
+scheduler.add_job(refresh_flights, "cron", args=["international", "arrival"], minute=schedules[0])
+scheduler.add_job(refresh_flights, "cron", args=["international", "departure"], minute=schedules[1])
+scheduler.add_job(refresh_flights, "cron", args=["domestic", "arrival"], minute=schedules[2])
+scheduler.add_job(refresh_flights, "cron", args=["domestic", "departure"], minute=schedules[3])
 
 atexit.register(lambda: scheduler.shutdown())
 
@@ -142,7 +137,8 @@ def refresh_data():
                 flight_number=flights["Flight number"][i],
                 status=flights["Status"][i],
                 scheduled_time=flights["Scheduled time"][i],
-                estimated_time=flights["Estimated time"][i]
+                estimated_time=flights["Estimated time"][i],
+                time_modified=str(datetime.now())
             )
 
             db.session.add(flight)
@@ -169,7 +165,6 @@ def newresults():
         "estimated_time": "Estimated time",
         "time_modified": "Time Modified"}, inplace=True)
     flights.sort_values(by=['Scheduled time'], inplace=True)
-    flights.drop(columns=["id"], inplace=True)
 
     pd.options.display.max_colwidth = 200
     return render_template("flights.html", tables=[flights.to_html(index=False, classes="flights", escape=False, formatters=dict(Type=path_to_image_html, Logo=path_to_image_html))], titles=['Sydney flights'])
