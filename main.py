@@ -107,11 +107,11 @@ def ping_app():
 
 
 # Set up cron schedules to refresh data
-schedules = ["0, 12, 24, 36, 48",
-             "3, 15, 27, 39, 51",
-             "6, 18, 30, 42, 54",
-             "9, 21, 33, 45, 57",
-             "1, 22, 43"]
+schedules = ["0",
+             "15",
+             "30",
+             "45",
+             "20, 40, 59"]
 scheduler = BackgroundScheduler()
 scheduler.start()
 scheduler.add_job(refresh_flights, "cron", args=["international", "arrival"], minute=schedules[0])

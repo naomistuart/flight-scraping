@@ -37,7 +37,7 @@ def flightscraper2(terminal, journey):
 
     # Loop through each combination of (domestic/international) x (arrival/departure)
     url = "https://www.sydneyairport.com.au/flights/?query=&flightType=" + journey + "&terminalType=" + terminal + "&date=" + today + "&sortColumn=scheduled_time&ascending=true&showAll=true"
-    print(url) # logs
+    print("Getting data for {}_{} flights".format(terminal, journey)))
     driver.get(url)
     
     html_soup = BeautifulSoup(driver.page_source, "html.parser")
@@ -88,5 +88,7 @@ def flightscraper2(terminal, journey):
         'Scheduled time': scheduled_times,
         'Estimated time': estimated_times 
     }
-   
+    
+    print("Finished getting data for {}_{} flights".format(terminal, journey)))
+    
     return flights
