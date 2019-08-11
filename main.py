@@ -121,24 +121,24 @@ def ping_app():
 
 
 # Set up cron schedules to refresh data
-# schedules = ["0",
-#              "15",
-#              "30",
-#              "45",
-#              "20, 40, 59"]
+schedules = ["0",
+             "15",
+             "30",
+             "45",
+             "20, 40, 59", "6-23"]
 
-schedules = ["0, 12, 24, 36, 48",
-             "3, 15, 27, 39, 51",
-             "6, 18, 30, 42, 54",
-             "9, 21, 33, 45, 57",
-             "1, 22, 43"]
-scheduler = BackgroundScheduler()
+# schedules = ["0, 12, 24, 36, 48",
+#              "3, 15, 27, 39, 51",
+#              "6, 18, 30, 42, 54",
+#              "9, 21, 33, 45, 57",
+#              "1, 22, 43"]
+scheduler = BackgroundScheduler(timezone="Australia/Sydney")
 scheduler.start()
 scheduler.add_job(refresh_flights, "cron", args=["international", "arrival"], minute=schedules[0])
 scheduler.add_job(refresh_flights, "cron", args=["international", "departure"], minute=schedules[1])
 scheduler.add_job(refresh_flights, "cron", args=["domestic", "arrival"], minute=schedules[2])
 scheduler.add_job(refresh_flights, "cron", args=["domestic", "departure"], minute=schedules[3])
-scheduler.add_job(ping_app, "cron", minute=schedules[4])
+scheduler.add_job(ping_app, "cron", minute=schedules[4], hour=schedules[5])
 
 atexit.register(lambda: scheduler.shutdown())
 
